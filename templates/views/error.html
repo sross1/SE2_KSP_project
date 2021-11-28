@@ -7,15 +7,43 @@
 <script type="text/javascript" src="fileUpload.js"></script>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="../../static/styles.css">
-<style>
-  a {
-    font-size: 25px;
-  }
-</style>
+
+<title> Error </title>
 </head>
-<body class="center">
-  <div align="center">
-    <h1> {{ err }} </h1>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Friend Finder</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        {% if authed %}
+          <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
+        {% else %}
+          <a class="nav-link" href="/">Login</a>
+        {% endif %}
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/all_profiles">All Profiles</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Friends (WIP)</a>
+      </li>
+      {% if authed %}
+      <li class="nav-item">
+        <a class="nav-link" href="/logout"> Logout </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<body>
+  <div class="center" align="center">
+    <h2> {{ err }} </h2>
     <a href='/'> Return Home </a>
   </div>
 </body>

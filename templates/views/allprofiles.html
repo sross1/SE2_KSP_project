@@ -7,51 +7,61 @@
 <script type="text/javascript" src="fileUpload.js"></script>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="../../static/styles.css">
-<title> @{{ user_profile.username }} </title>
+<title> All Profiles </title>
 <style>
-.parent{
-  display:grid;
-  justify-content: center;
-}
+  .parent {
+    display: grid;
+    grid-template-columns: 600px 600px 600px;
+    grid-template-rows: auto;
+    justify-content: center;
+
+  }
+
+  .card {
+      border:1px solid black;
+  }
 </style>
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">Friend Finder</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          {% if authed %}
-            <a class="nav-link" href="/profile/{{ user_profile.username }}">My Profile</a>
-          {% else %}
-            <a class="nav-link" href="/">Login</a>
-          {% endif %}
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/all_profiles">All Profiles</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Friends (WIP)</a>
-        </li>
 
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Friend Finder</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
         {% if authed %}
-        <li class="nav-item">
-          <a class="nav-link" href="/logout"> Logout </a>
-        </li>
+          <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
+        {% else %}
+          <a class="nav-link" href="/">Login</a>
         {% endif %}
-      </ul>
-    </div>
-  </nav>
-  <div class="parent center container mt-5">
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/all_profiles">All Profiles</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Friends (WIP)</a>
+      </li>
+      {% if authed %}
+      <li class="nav-item">
+        <a class="nav-link" href="/logout"> Logout </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<body>
+<div class="parent">
+  {% for user_profile in user_profile_list %}
+  <div class="container mt-5">
     <div>
-        <div class="col-md-7">
-            <div class="card p-3 py-4" style="width: 26rem;">
+        <div class="md-7">
+            <div class="card p-3 py-4" style="width: 22rem;">
                 <div class="text-center"> <img src="https://files.catbox.moe/6pi59a.jpg" width="100" class="rounded-circle"> </div>
                     <h5 align="center" class="mt-2 mb-0"> @{{ user_profile.username }} </h5> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
                     <h5 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h5>
@@ -66,19 +76,13 @@
                         {% endfor %}
                     </ul>
                     <br>
-                    {% if authed %}
-                    <div class="buttons" align="center">
-                      <button class="btn btn-outline-primary px-4">Edit</button>
-                    </div>
-                    {% else %}
                     <div class="buttons" align="center">
                       <button class="btn btn-outline-primary px-4">Friend (coming soon)</button>
                     </div>
-                    {% endif %}
-                </div>
             </div>
         </div>
     </div>
+  </div>
+  {% endfor %}
 </div>
 </body>
-</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/bootstrap-filestyle.min.js"> </script>
+<script type="text/javascript" src="fileUpload.js"></script>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="stylesheet" href="../../static/styles.css">
+</head>
+
+<body class="center">
+  <div class="my-5" align="center">
+    <h1> Campus Friend Finder </h1>
+    <h3> An easy way to find friends with similar interests. </h3>
+  </div>
+  <form method="POST" action="/login">
+    <div class="form-group" align="center">
+      <div>
+          <label for="username">Username: </label>
+          <input type="text" id="username" name="username" required>
+      </div>
+      <div>
+          <label for="pass">Password: </label>
+          <input type="password" id="pass" name="password" minlength="8" required>
+      </div>
+      <input class="btn btn-success my-3" type="submit" value="Login">
+    </div>
+  </form>
+  <div align="center">
+    <a href="/register"> No account? Register here! </a>
+  </div>
+</body>

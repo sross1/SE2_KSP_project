@@ -55,7 +55,7 @@ def find_user_profile(username):
         return accs[0]
 
     else:
-        return user_profile('blank', 'blank', 'blank', 'blank', 'blank', 'blank', [])
+        return None
 
 
 def verify_credentials(username, password):
@@ -73,13 +73,57 @@ def verify_credentials(username, password):
 
 @app.route('/')
 def index():
-    return render_template('views/index.html')
+    try:
+        username = request.cookies.get('userID')
+        if username:
+            return render_template('views/index.html', authed=True, username=username)
+
+        else:
+            return render_template('views/index.html', authed=False, username='')
+    except:
+        return render_template('views/index.html', authed=False, username='')
+
+@app.route('/all_profiles')
+def get_all():
+    try:
+        username = request.cookies.get('userID')
+        user_profile_list = []
+        cursor = user_profile_db
+        for x in cursor.find():
+            pro = user_profile(x['username'], x['name'], x['age'], x['major'], x['year'], x['biography'], x['interests'])
+            user_profile_list.append(pro)
+
+
+        if username:
+            return render_template('views/allprofiles.html', authed=True, username=username, user_profile_list=user_profile_list)
+
+        else:
+            return render_template('views/allprofiles.html', authed=False, user_profile_list=user_profile_list)
+
+    except:
+        return render_template('views/allprofiles.html', authed=False, user_profile_list=user_profile_list)
 
 
 @app.route('/create_profile', methods=['POST'])
-def create_profile(username, name, age, major, year, biography, interests):
-    profile_dict = {"username": username, "name": name, "age": age, "major": major, "year": year, "biography": biography, "interests": interests}
-    user_profile_db.insert_one(profile_dict)
+def create_profile():
+    try:
+        username = request.cookies.get('userID')
+        if not find_user_profile(username):
+            name = request.form['realname']
+            age = request.form['age']
+            major = request.form['major']
+            year = request.form['year']
+            biography = request.form['biography']
+            interests = [i.strip() for i in request.form['interests'].split(',')]
+            profile_dict = {"username": username, "name": name, "age": age, "major": major, "year": year, "biography": biography, "interests": interests}
+            user_profile_db.insert_one(profile_dict)
+            return redirect(f'/profile/{username}')
+
+        else:
+            return render_template('views/error.html', err='Profile has already been set up. Please edit any mistakes.')
+
+    except Exception as err:
+        return render_template('views/error.html', err=err)
 
 
 
@@ -91,13 +135,14 @@ def create():
         if not find_account(username):
             account_dict = {"username": username, "password": password}
             user_account_db.insert_one(account_dict)
-            return render_template_string("account created")
+            resp = make_response(redirect(f'/profile/{username}'))
+            resp.set_cookie('userID', username)
+            return resp
         else:
             return render_template('views/error.html', err='Username already taken.')
 
     except Exception as error:
         print(f'ERROR: {str(error)}')
-
 
 
 @app.route('/register', methods=['GET'])
@@ -110,20 +155,47 @@ def login():
     username = request.form['username']
     password = request.form['password']
     if verify_credentials(username, password):
-        resp = make_response(render_template('views/profile.html', user_profile=find_user_profile(username)))
+        resp = make_response(redirect(f'/profile/{username}'))
         resp.set_cookie('userID', username)
         return resp
 
     else:
         return render_template('views/error.html', err='User/password combo entered does not exist.')
 
+
+@app.route('/setup_profile')
+def setup_profile():
+    try:
+        auth = request.cookies.get('userID')
+        if auth:
+            return render_template('views/createprofile.html', authed=True, username=auth)
+    except Exception:
+        return render_template('views/error.html', err='Please log in to edit profile.')
+
+
 @app.route('/profile/<username>')
 def get_user(username):
+    setup = False
+    authed = False
+    auth = request.cookies.get('userID')
+    if auth == username:
+        authed = True
+
     user = find_user_profile(username)
-    if user.username == 'blank':
-        return render_template('views/error.html', err='User not found.')
+
+    if user:
+        return render_template('views/profile.html', user_profile=user, authed=authed)
     else:
-        return render_template('views/profile.html', user_profile=user)
+        if authed:
+            return redirect('/setup_profile')
+        else:
+            return render_template('views/error.html', err='Profile does not exist.')
+
+@app.route('/logout')
+def logout():
+    resp = make_response(redirect('/'))
+    resp.set_cookie('userID', '', expires=0)
+    return resp
 
 @app.errorhandler(404)
 def page_not_found(e):

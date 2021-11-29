@@ -1,0 +1,43 @@
+<style>
+
+* {
+  font-family: "Oswald", monospace;
+}
+
+label{
+  color: white;
+}
+
+h1{
+  font-size: 3rem;
+  color:white;
+}
+
+h3{
+  color:white;
+}
+
+
+.center{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+body{
+  background-color: #333;
+  font-size: 16px;
+}
+
+textarea {
+    border-style: none;
+    border-color: Transparent;
+    overflow: auto;
+    outline: none;
+    resize: none;
+}
+
+</style>

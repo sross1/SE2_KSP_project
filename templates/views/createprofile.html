@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/bootstrap-filestyle.min.js"> </script>
+<script type="text/javascript" src="fileUpload.js"></script>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="stylesheet" href="../../static/styles.css">
+<style>
+textarea
+{
+  font-size: 2px
+}
+h2{
+  font-size: 2rem;
+  color:black;
+}
+</style>
+<title> Create Profile </title>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="#">Friend Finder</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          {% if authed %}
+            <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
+          {% else %}
+            <a class="nav-link" href="/">Login</a>
+          {% endif %}
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/all_profiles">All Profiles</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Friends (WIP)</a>
+        </li>
+        {% if authed %}
+        <li class="nav-item">
+          <a class="nav-link" href="/logout"> Logout </a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+  <div>
+    <h2 class="my-4" align="center"> Create Profile </h2>
+    <form method="POST" action="/create_profile">
+      <div class="md-form" align="center">
+        <div class="my-3 w-25">
+            <label for="realname">Name: </label>
+            <input class="form-control" type="text" id="realname" name="realname">
+        </div>
+        <div class="my-3 w-25">
+            <label for="age">Age: </label>
+            <input class="form-control" type="number" id="age" name="age">
+        </div>
+        <div class="my-3 w-25">
+            <label for="major">Major: </label>
+            <input class="form-control" type="text" id="major" name="major">
+        </div>
+        <div class="my-3 w-25">
+            <label for="year">Year: </label>
+            <select class="form-control" name="year" id="year">
+              <option value="Freshman">Freshman</option>
+              <option value="Sophomore">Sophomore</option>
+              <option value="Junior">Junior</option>
+              <option value="Senior">Senior</option>
+            </select>
+        </div>
+        <div class="my-3 w-25">
+            <label for="biography">Personal Biography: </label>
+            <textarea class="md-textarea form-control" rows="3" type="text" id="biography" name="biography" placeholder="Hello, my name is..."></textarea>
+        </div>
+
+        <div class="my-3 w-25">
+            <label for="interests">Interests (separate each with comma): </label>
+            <textarea class="md-textarea form-control" rows="3" type="text" id="interests" name="interests" placeholder="a, b, c.."></textarea>
+        </div>
+
+
+        <input class="btn btn-success my-5" type="submit" value="Create Profile">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

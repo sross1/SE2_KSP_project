@@ -17,11 +17,17 @@
   opacity:0;
   transition:3s;
   }
+
+  a{
+    font-size: 1rem;
+  }
+
 </style>
 <title> Campus Friend Finder </title>
 </head>
 
 <body>
+  <div id="bgimg"></div>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">Friend Finder</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +46,7 @@
           {% endif %}
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/all_profiles">All Profiles</a>
+          <a class="nav-link" href="/all-profiles">All Profiles</a>
         </li>
         <li class="nav-item">
           <a class="nav-link disabled" href="#">Friends (WIP)</a>
@@ -54,8 +60,8 @@
     </div>
   </nav>
   <div class="my-5" align="center" id="fademe">
-    <h1> Campus Friend Finder </h1>
-    <h3> An easy way to find friends with similar interests. </h3>
+    <strong><h1> Campus Friend Finder </h1></strong>
+    <strong><h3> An easy way to find friends with similar interests. </h3></strong>
   </div>
   <script>
   window.onload = function(){
@@ -64,30 +70,29 @@
     }
   </script>
   <div id="fadeafter">
-    {% if not authed %}
-      <form method="POST" action="/login">
-        <div class="form-group" align="center">
-          <div class="w-25">
-              <label for="username">Username: </label>
-              <input class="form-control" type="text" id="username" name="username" required>
-          </div>
-          <div class="my-3 w-25">
-              <label for="pass">Password: </label>
-              <input class="form-control" type="password" id="pass" name="password" minlength="8" required>
-          </div>
-          <input class="btn btn-success my-3" type="submit" value="Login">
-        </div>
-      </form>
-
-    {% else %}
+    {% if authed %}
     <div align="center">
       <a href='/profile/{{ username }}'> You're currently logged in as @{{ username }}. </a>
     </div>
-    {% endif %}
-  <br>
+    {% else %}
+    <form method="POST" action="/login">
+      <div class="form-group" align="center">
+        <div class="w-25">
+            <strong><label for="username">Username: </label></strong>
+            <input class="form-control" type="text" id="username" name="username" required>
+        </div>
+        <div class="my-3 w-25">
+            <strong><label for="pass">Password: </label></strong>
+            <input class="form-control" type="password" id="pass" name="password" minlength="8" required>
+        </div>
+        <input class="btn btn-primary my-3" type="submit" value="Login">
+      </div>
+    </form>
+
     <div align="center">
       <a href="/register"> No account? Register here! </a>
     </div>
+    {% endif %}
   </div>
 </body>
 </html>

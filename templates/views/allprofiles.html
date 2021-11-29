@@ -17,8 +17,13 @@
 
   }
 
-  .card {
-      border:1px solid black;
+
+  body{
+    color: black;
+  }
+
+  a{
+    font-size:1rem;
   }
 </style>
 </head>
@@ -41,7 +46,7 @@
         {% endif %}
       </li>
       <li class="nav-item">
-        <a class="nav-link active" href="/all_profiles">All Profiles</a>
+        <a class="nav-link active" href="/all-profiles">All Profiles</a>
       </li>
       <li class="nav-item">
         <a class="nav-link disabled" href="#">Friends (WIP)</a>
@@ -61,13 +66,12 @@
   <div class="container mt-5">
     <div>
         <div class="md-7">
-            <div class="card p-3 py-4" style="width: 22rem;">
-                <div class="text-center"> <img src="https://files.catbox.moe/6pi59a.jpg" width="100" class="rounded-circle"> </div>
-                    <h5 align="center" class="mt-2 mb-0"> @{{ user_profile.username }} </h5> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
+            <div class="card p-3 py-4 border-dark" style="width: 22rem;">
+                <div class="text-center"> <img src="https://files.catbox.moe/kb2kvn.jpg" width="100" class="rounded-circle"> </div>
+                    <a align="center" href="/profile/{{ user_profile.username }}" class="mt-2 mb-0"> @{{ user_profile.username }} </a> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
                     <h5 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h5>
                     <div class="px-2 mt-3">
                         <p class="fonts"> {{ user_profile.biography }} </p>
-                    <br>
                         <p class="fonts"> Here are some of my interests: </p>
                     </div>
                     <ul class="social-list">
@@ -76,9 +80,15 @@
                         {% endfor %}
                     </ul>
                     <br>
+                    {% if authed and user_profile.username == username %}
+                    <div class="buttons" align="center">
+                      <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
+                    </div>
+                    {% else %}
                     <div class="buttons" align="center">
                       <button class="btn btn-outline-primary px-4">Friend (coming soon)</button>
                     </div>
+                    {% endif %}
             </div>
         </div>
     </div>

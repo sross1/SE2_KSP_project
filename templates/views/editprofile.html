@@ -12,12 +12,9 @@ textarea
 {
   font-size: 2px
 }
-h2{
-  font-size: 2rem;
-  color:black;
-}
+
 </style>
-<title> Create Profile </title>
+<title> Edit Profile </title>
 </head>
 
 <body>
@@ -33,7 +30,7 @@ h2{
         </li>
         <li class="nav-item">
           {% if authed %}
-            <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
+            <a class="nav-link" href="/profile/{{ user_profile.username }}">My Profile</a>
           {% else %}
             <a class="nav-link" href="/">Login</a>
           {% endif %}
@@ -42,7 +39,7 @@ h2{
           <a class="nav-link" href="/all-profiles">All Profiles</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="#">Friends (WIP)</a>
+          <a class="nav-link disabled" href="/">Friends (WIP)</a>
         </li>
         {% if authed %}
         <li class="nav-item">
@@ -53,42 +50,59 @@ h2{
     </div>
   </nav>
   <div>
-    <h2 class="my-4" align="center"> Create Profile </h2>
-    <form method="POST" action="/create_profile">
+    <h1 class="my-4" align="center"> Edit Profile </h2>
+    <form method="POST" action="/edit_profile_layout">
       <div class="md-form" align="center">
         <div class="my-3 w-25">
             <label for="realname">Name: </label>
-            <input class="form-control" type="text" id="realname" name="realname">
+            <input class="form-control" type="text" id="realname" name="realname" value="{{ user_profile.name }}">
         </div>
         <div class="my-3 w-25">
             <label for="age">Age: </label>
-            <input class="form-control" type="number" id="age" name="age">
+            <input class="form-control" type="number" id="age" name="age" value="{{ user_profile.age }}">
         </div>
         <div class="my-3 w-25">
             <label for="major">Major: </label>
-            <input class="form-control" type="text" id="major" name="major">
+            <input class="form-control" type="text" id="major" name="major" value="{{ user_profile.major }}">
         </div>
         <div class="my-3 w-25">
             <label for="year">Year: </label>
             <select class="form-control" name="year" id="year">
-              <option value="Freshman">Freshman</option>
-              <option value="Sophomore">Sophomore</option>
-              <option value="Junior">Junior</option>
-              <option value="Senior">Senior</option>
+              {% if user_profile.year == "Freshman" %}
+                <option value="Freshman" selected>Freshman</option>
+                <option value="Sophomore">Sophomore</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior">Senior</option>
+              {% elif user_profile.year == "Sophomore" %}
+                <option value="Freshman">Freshman</option>
+                <option value="Sophomore" selected>Sophomore</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior">Senior</option>
+              {% elif user_profile.year == "Junior" %}
+                <option value="Freshman" selected>Freshman</option>
+                <option value="Sophomore">Sophomore</option>
+                <option value="Junior" selected>Junior</option>
+                <option value="Senior">Senior</option>
+              {% elif user_profile.year == "Senior" %}
+                <option value="Freshman" selected>Freshman</option>
+                <option value="Sophomore">Sophomore</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior" selected>Senior</option>
+              {% endif %}
             </select>
         </div>
         <div class="my-3 w-25">
             <label for="biography">Personal Biography: </label>
-            <textarea class="md-textarea form-control" rows="3" type="text" id="biography" name="biography" placeholder="Hello, my name is..."></textarea>
+            <textarea class="md-textarea form-control" rows="3" type="text" id="biography" name="biography">{{ user_profile.biography }}</textarea>
         </div>
 
         <div class="my-3 w-25">
             <label for="interests">Interests (separate each with comma): </label>
-            <textarea class="md-textarea form-control" rows="3" type="text" id="interests" name="interests" placeholder="a, b, c.."></textarea>
+            <textarea class="md-textarea form-control" rows="3" type="text" id="interests" name="interests" >{{ interests }}</textarea>
         </div>
 
 
-        <input class="btn btn-success my-5" type="submit" value="Create Profile">
+        <input class="btn btn-primary my-5" type="submit" value="Save Changes">
       </div>
     </form>
   </div>

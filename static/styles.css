@@ -1,21 +1,28 @@
 <style>
 
+div.index
+
 * {
-  font-family: "Oswald", monospace;
+  font-family: "Arial", monospace !important;
 }
 
 label{
   color: white;
+  font-size: 1.5rem;
+  font-weight:bold;
+  -webkit-text-stroke: 1px #000;
 }
 
 h1{
-  font-size: 3rem;
-  color:white;
+  font-size: 4rem;
+  color: white;
+  -webkit-text-stroke: 1px #000;
 }
 
 h3{
-  color:white;
+  -webkit-text-stroke: 1px #000;
 }
+
 
 
 .center{
@@ -28,8 +35,11 @@ h3{
 }
 
 body{
-  background-color: #333;
+  color: white;
   font-size: 16px;
+  background-image: url('logo.jpg');
+  background-color: rgba(255,255,255,0.6);
+  background-blend-mode: lighten;
 }
 
 textarea {

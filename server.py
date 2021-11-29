@@ -1,4 +1,5 @@
 from flask import Flask, render_template_string, render_template, Response, request, redirect, url_for, make_response
+from cryptography.fernet import Fernet
 import pymongo
 import random
 import string
@@ -9,7 +10,9 @@ my_client = pymongo.MongoClient("mongodb://localhost:27017/")
 my_db = my_client["SE2_Friend_Finder"]
 user_account_db = my_db["user_accounts"]
 user_profile_db = my_db["user_profiles"]
-
+friend_db = my_db["friend_relationships"]
+key = open('encrypt.key', 'rb').read()
+f = Fernet(key)
 
 class user_account:
     def __init__(self, username, password):
@@ -61,15 +64,30 @@ def find_user_profile(username):
 def verify_credentials(username, password):
     verified = False
     count = 0
-    query = {"username": username, "password": password}
+    query = {"username": username}
     mydoc = user_account_db.find(query)
     for x in mydoc:
-        count+=1
-
-    if count > 0:
-        verified = True
+        if  password == f.decrypt(x['password']).decode():
+            verified = True
 
     return verified
+
+def check_friendship(username1, username2):
+    counter = 0
+    query = {"username1": username1, "username2": username2}
+    mydoc = friend_db.find(query)
+    for x in mydoc:
+        counter+=1
+
+    if counter == 0:
+        return False
+
+    else:
+        return True
+
+def create_a_friendship(username1, username2):
+    friend_dict = {"username1": username1, "username2": username2, "status": 1}
+    friend_db.insert_one(friend_dict)
 
 @app.route('/')
 def index():
@@ -83,7 +101,21 @@ def index():
     except:
         return render_template('views/index.html', authed=False, username='')
 
-@app.route('/all_profiles')
+
+
+@app.route('/create_friendship', methods=['POST'])
+def create_friendship():
+    users = request.args.get('users').split(' ')
+    print(users)
+    if not check_friendship(users[0], users[1]):
+        create_a_friendship(users[0], users[1])
+        return redirect(f'/profile/{users[1]}')
+
+    else:
+        return
+
+
+@app.route('/all-profiles')
 def get_all():
     try:
         username = request.cookies.get('userID')
@@ -95,7 +127,7 @@ def get_all():
 
 
         if username:
-            return render_template('views/allprofiles.html', authed=True, username=username, user_profile_list=user_profile_list)
+            return render_template('views/allprofiles.html', check_friendship=check_friendship, authed=True, username=username, user_profile_list=user_profile_list)
 
         else:
             return render_template('views/allprofiles.html', authed=False, user_profile_list=user_profile_list)
@@ -131,7 +163,7 @@ def create_profile():
 def create():
     try:
         username = request.form['username']
-        password = request.form['password']
+        password = f.encrypt(request.form['password'].encode())
         if not find_account(username):
             account_dict = {"username": username, "password": password}
             user_account_db.insert_one(account_dict)
@@ -176,15 +208,19 @@ def setup_profile():
 @app.route('/profile/<username>')
 def get_user(username):
     setup = False
+    authedself = False
     authed = False
     auth = request.cookies.get('userID')
     if auth == username:
+        authedself = True
+
+    if auth:
         authed = True
 
     user = find_user_profile(username)
 
     if user:
-        return render_template('views/profile.html', user_profile=user, authed=authed)
+        return render_template('views/profile.html', check_friendship=check_friendship, auth=auth, authedself=authedself , user_profile=user, authed=authed)
     else:
         if authed:
             return redirect('/setup_profile')
@@ -197,10 +233,39 @@ def logout():
     resp.set_cookie('userID', '', expires=0)
     return resp
 
+
+@app.route('/edit_profile')
+def edit_profile():
+    auth = request.cookies.get('userID')
+    user = find_user_profile(auth)
+    interests = ', '.join(user.interests)
+    if user:
+        return render_template('views/editprofile.html', user_profile=user, interests=interests, authed=True)
+    else:
+        if authed:
+            return redirect('/setup_profile')
+
+
+
+@app.route('/edit_profile_layout', methods=['POST'])
+def edit_profile_layout():
+    auth = request.cookies.get('userID')
+    user = find_user_profile(auth)
+    myquery = { "username": auth }
+    name = request.form['realname']
+    age = request.form['age']
+    major = request.form['major']
+    year = request.form['year']
+    biography = request.form['biography']
+    interests = [i.strip() for i in request.form['interests'].split(',')]
+    profile_dict = { "$set": {"name": name, "age": age, "major": major, "year": year, "biography": biography, "interests": interests}}
+    user_profile_db.update_one(myquery, profile_dict)
+    return redirect(f'/profile/{auth}')
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return redirect('/')
-
 
 
 if __name__ == '__main__':

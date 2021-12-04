@@ -8,11 +8,16 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="../../static/styles.css">
 <title> Register </title>
+<style>
+#already{
+  font-size:20px;
+}
+</style>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">Friend Finder</a>
+    <a class="navbar-brand" href="/">Friend Finder</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -31,14 +36,6 @@
         <li class="nav-item">
           <a class="nav-link" href="/all-profiles">All Profiles</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Friends (WIP)</a>
-        </li>
-        {% if authed %}
-        <li class="nav-item">
-          <a class="nav-link" href="/logout"> Logout </a>
-        </li>
-        {% endif %}
       </ul>
     </div>
   </nav>
@@ -47,7 +44,7 @@
     <div class="form-group" align="center">
       <div class="my-3 w-25">
           <label for="username">Username: </label>
-          <input class="form-control" type="text" id="username" name="username">
+          <input minlength="2" maxlength="20" class="form-control" type="text" id="username" name="username">
       </div>
       <div class="my-3 w-25">
           <label for="pass">Password: </label>
@@ -59,7 +56,7 @@
   </form>
 
   <div align="center">
-    <a href="/"> Already have an account? Log in! </a>
+    <a href="/" id="already"> Already have an account? Log in! </a>
   </div>
 </body>
 </html>

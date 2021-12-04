@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../../static/styles.css">
 <title> @{{ user_profile.username }} </title>
 <style>
+
 .parent{
   display:grid;
   justify-content: center;
@@ -18,13 +19,10 @@ body{
   color: black;
 }
 
-a{
-  font-size:20px;
-}
 </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand navbar-dark bg-primary">
     <a class="navbar-brand" href="#">Friend Finder</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -32,33 +30,52 @@ a{
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="/">Home </a>
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item">
-          {% if authed %}
+        {% if authed %}
+        <li class="nav-item active">
             <a class="nav-link" href="/profile/{{ user_profile.username }}">My Profile</a>
-          {% else %}
-            <a class="nav-link" href="/">Login</a>
-          {% endif %}
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="/">Login</a>
+        </li>
+        {% endif %}
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/all-profiles">All Profiles</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Friends (WIP)</a>
-        </li>
         {% if authed %}
+        <li class="nav-item">
+          <a class="nav-link" href="/friends">My Friends</a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link" href="/logout"> Logout </a>
         </li>
         {% endif %}
+
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0 ml-auto" method="POST" action="/search">
+            <div class="input-group">
+              <input type="search" id="searchquery" class="form-control rounded" placeholder="Search" aria-label="Search"
+              aria-describedby="search-addon" />
+              <button class="btn btn-light paddedBtn" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+              </button>
+            </div>
+          </form>
+        </li>
       </ul>
     </div>
+
   </nav>
   <div class="parent center container mt-5">
     <div>
         <div class="col-md-7">
-            <div class="card p-3 py-4 border-dark" style="width: 26rem">
+            <div class="card p-3 py-4 border-dark" style="width: 26rem; ">
                 <div class="text-center"> <img src="https://files.catbox.moe/kb2kvn.jpg" width="100" class="rounded-circle"> </div>
                     <h5 align="center" class="mt-2 mb-0"> @{{ user_profile.username }} </h5> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
                     <h6 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h6>
@@ -67,20 +84,33 @@ a{
                         <p class="fonts"> Here are some of my interests: </p>
                     </div>
                     <ul class="social-list">
-                        {% for interest in user_profile.interests %}
-                          <li> {{ interest }} </li>
-                        {% endfor %}
+                    {% for interest in user_profile.interests %}
+                      <li> {{ interest }} </li>
+                    {% endfor %}
                     </ul>
                     <br>
-                    {% if authed %}
-                    <div class="buttons" align="center">
-                      <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
-                    </div>
-                    {% else %}
-                    <div class="buttons" align="center">
-                      <button class="btn btn-outline-primary px-4">Friend (coming soon)</button>
-                    </div>
+                    {% if authedself %}
+                      <div class="buttons" align="center">
+                        <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
+                      </div>
+                    {% elif authed %}
+                      <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
+                        {% if check_friendship(auth, user_profile.username) == 0 %}
+                        <div class="buttons" align="center">
+                          <button class="btn btn-outline-primary px-4">Friend</button>
+                        </div>
+                      </form>
+                    {% elif check_friendship(auth, user_profile.username) == 1 %}
+                      <div class="buttons" align="center">
+                        <button class="btn btn-success disabled px-4">Sent</button>
+                      </div>
+
+                    {% elif check_friendship(auth, user_profile.username) == 2 %}
+                      <div class="buttons" align="center">
+                        <button class="btn btn-success disabled px-4">Friends</button>
+                      </div>
                     {% endif %}
+                  {% endif %}
                 </div>
             </div>
         </div>

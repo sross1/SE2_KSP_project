@@ -21,17 +21,17 @@ h2{
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand navbar-dark bg-primary">
     <a class="navbar-brand" href="#">Friend Finder</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item active">
           {% if authed %}
             <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
           {% else %}
@@ -41,32 +41,47 @@ h2{
         <li class="nav-item">
           <a class="nav-link" href="/all-profiles">All Profiles</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Friends (WIP)</a>
-        </li>
         {% if authed %}
+        <li class="nav-item">
+          <a class="nav-link" href="/friends">My Friends</a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link" href="/logout"> Logout </a>
         </li>
         {% endif %}
+        <li class="nav-item">
+          <form class="form-inline my-2 my-lg-0 ml-auto" method="POST" action="/search">
+            <div class="input-group">
+              <input type="search" class="form-control rounded" id="searchquery" placeholder="Search" aria-label="Search"
+              aria-describedby="search-addon" />
+              <button class="btn btn-light paddedBtn" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+              </button>
+            </div>
+          </form>
+        </li>
       </ul>
     </div>
   </nav>
   <div>
-    <h2 class="my-4" align="center"> Create Profile </h2>
+
+    <h1 class="my-4" align="center"> Create Profile </h1>
     <form method="POST" action="/create_profile">
       <div class="md-form" align="center">
         <div class="my-3 w-25">
             <label for="realname">Name: </label>
-            <input class="form-control" type="text" id="realname" name="realname">
+            <input required minlength="5" class="form-control" type="text" id="realname" name="realname">
         </div>
         <div class="my-3 w-25">
             <label for="age">Age: </label>
-            <input class="form-control" type="number" id="age" name="age">
+            <input required class="form-control" type="number" id="age" name="age">
         </div>
         <div class="my-3 w-25">
             <label for="major">Major: </label>
-            <input class="form-control" type="text" id="major" name="major">
+            <input minlength="2" required class="form-control" type="text" id="major" name="major">
         </div>
         <div class="my-3 w-25">
             <label for="year">Year: </label>
@@ -79,12 +94,12 @@ h2{
         </div>
         <div class="my-3 w-25">
             <label for="biography">Personal Biography: </label>
-            <textarea class="md-textarea form-control" rows="3" type="text" id="biography" name="biography" placeholder="Hello, my name is..."></textarea>
+            <textarea required minlength="2" maxlength="160" class="md-textarea form-control" rows="3" type="text" id="biography" name="biography" placeholder="Max of 160 characters."></textarea>
         </div>
 
         <div class="my-3 w-25">
             <label for="interests">Interests (separate each with comma): </label>
-            <textarea class="md-textarea form-control" rows="3" type="text" id="interests" name="interests" placeholder="a, b, c.."></textarea>
+            <textarea required minlength="2" class="md-textarea form-control" rows="3" type="text" id="interests" name="interests" placeholder="a, b, c.."></textarea>
         </div>
 
 

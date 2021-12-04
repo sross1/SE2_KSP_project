@@ -17,9 +17,6 @@
 
   }
 
-  .profile{
-    font-size: 22px;
-  }
 
   body{
     color: black;
@@ -43,7 +40,7 @@
       </li>
       <li class="nav-item">
         {% if authed %}
-          <a class="nav-link" href="/profile/{{ auth }}">My Profile</a>
+          <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
         {% else %}
           <a class="nav-link" href="/">Login</a>
         {% endif %}
@@ -51,11 +48,10 @@
       <li class="nav-item active">
         <a class="nav-link" href="/all-profiles">All Profiles</a>
       </li>
-      {% if authed %}
       <li class="nav-item">
         <a class="nav-link" href="/friends">My Friends</a>
       </li>
-
+      {% if authed %}
       <li class="nav-item">
         <a class="nav-link" href="/logout"> Logout </a>
       </li>
@@ -81,11 +77,11 @@
   {% for user_profile in user_profile_list %}
   <div class="container mt-5">
     <div>
-        <div class="col-md-7">
-            <div class="card p-3 py-4 border-dark" style="width: 26rem; ">
+        <div class="md-7">
+            <div class="card p-3 py-4 border-dark" style="width: 22rem;">
                 <div class="text-center"> <img src="https://files.catbox.moe/kb2kvn.jpg" width="100" class="rounded-circle"> </div>
-                    <a href="/profile/{{ user_profile.username}}" align="center" class="profile mt-2 mb-0"> @{{ user_profile.username }} </a> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
-                    <h6 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h6>
+                    <a align="center" href="/profile/{{ user_profile.username }}" class="mt-2 mb-0"> @{{ user_profile.username }} </a> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
+                    <h5 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h5>
                     <div class="px-2 mt-3">
                         <p class="fonts"> {{ user_profile.biography }} </p>
                         <p class="fonts"> Here are some of my interests: </p>
@@ -96,32 +92,27 @@
                         {% endfor %}
                     </ul>
                     <br>
-                    {% if authed and auth==user_profile.username %}
+                    {% if authed and user_profile.username == username %}
+                    <div class="buttons" align="center">
+                      <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
+                    </div>
+                    {% elif authed and user_profile.username != username %}
+                    <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
+                      {% if not check_friendship(username, user_profile.username) %}
                       <div class="buttons" align="center">
-                        <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
+                        <button class="btn btn-outline-primary px-4">Friend</button>
                       </div>
-                    {% elif authed %}
-                    {% if check_friendship(auth, user_profile.username) == 0 %}
-                      <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
-                        <div class="buttons" align="center">
-                          <button class="btn btn-outline-primary px-4">Friend</button>
-                        </div>
-                      </form>
-                    {% elif check_friendship(auth, user_profile.username) == 1 %}
+                    </form>
+                      {% else %}
                       <div class="buttons" align="center">
-                        <button class="btn btn-success disabled px-4">Sent</button>
+                        <button class="btn btn-success px-4">Friends</button>
                       </div>
-
-                    {% elif check_friendship(auth, user_profile.username) == 2 %}
-                      <div class="buttons" align="center">
-                        <button class="btn btn-success disabled px-4">Friends</button>
-                      </div>
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                </div>
             </div>
         </div>
     </div>
+  </div>
   {% endfor %}
 </div>
 </body>

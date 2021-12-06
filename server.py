@@ -15,8 +15,9 @@ key = open('encrypt.key', 'rb').read()
 f = Fernet(key)
 
 class user_account:
-    def __init__(self, username, password):
+    def __init__(self, username, email, password):
         self.username = username
+        self.email = email
         self.password = password
 
 
@@ -82,6 +83,14 @@ def find_account(username):
         found = True
 
     return found
+
+def find_account_email(username):
+    query = {"username": username}
+    mydoc = user_account_db.find(query)
+    for x in mydoc:
+        email = x['email']
+
+    return email
 
 def find_user_profile(username):
     found = False
@@ -245,10 +254,11 @@ def create_profile():
 def create():
     try:
         username = request.form['username'].replace(' ', '')
+        email = request.form['email']
         if len(username) > 1:
             password = f.encrypt(request.form['password'].encode())
             if not find_account(username):
-                account_dict = {"username": username, "password": password}
+                account_dict = {"username": username, "email": email, "password": password}
                 user_account_db.insert_one(account_dict)
                 resp = make_response(redirect(f'/profile/{username}'))
                 resp.set_cookie('userID', username)
@@ -288,6 +298,7 @@ def setup_profile():
         auth = request.cookies.get('userID')
         if auth:
             return render_template('views/createprofile.html', authed=True, username=auth)
+
     except Exception as profile_err:
         print(profile_err)
         return render_template('views/error.html', err='Please log in to edit profile.')
@@ -306,9 +317,11 @@ def get_user(username):
         authed = True
 
     user = find_user_profile(username)
+    email = find_account_email(username)
 
     if user:
-        return render_template('views/profile.html', check_friendship=check_friendship, auth=auth, authedself=authedself , user_profile=user, authed=authed)
+        return render_template('views/profile.html', email=email, check_friendship=check_friendship, auth=auth, authedself=authedself , user_profile=user, authed=authed)
+
     else:
         if authed:
             return redirect('/setup-profile')

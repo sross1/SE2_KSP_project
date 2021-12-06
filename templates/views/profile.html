@@ -88,6 +88,12 @@ body{
                       <li> {{ interest }} </li>
                     {% endfor %}
                     </ul>
+
+                    {% if check_friendship(auth, user_profile.username) == 2 %}
+                    <div class="px-2 mt-3">
+                      <p class="fonts"> Contact email: <a href="mailto: {{ email }}"> {{ email }} </a> </p>
+                    </div>
+                    {% endif %}
                     <br>
                     {% if authedself %}
                       <div class="buttons" align="center">

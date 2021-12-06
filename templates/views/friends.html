@@ -9,19 +9,11 @@
 <link rel="stylesheet" href="../../static/styles.css">
 <title> All Profiles </title>
 <style>
-  table {
-  	display: fixed;
-    table-layout: fixed;
-  }
-  table tr {
-  	display: table-cell;
-  }
-  table tr td {
-  	display: block;
-  }
-
-  .container{
-    justify-content: space-evenly;
+  .parent {
+    display: grid;
+    grid-template-columns: fit-content(40%) fit-content(40%) fit-content(40%);
+    grid-template-rows: auto;
+    justify-content: center;
   }
 
   .profile{
@@ -34,6 +26,17 @@
 
   a{
     font-size:1rem;
+  }
+
+  label{
+    color: black;
+    font-size: 1.25rem;
+    font-weight: normal;
+  }
+
+  .inner
+  {
+      display: inline-block;
   }
 </style>
 </head>
@@ -54,11 +57,11 @@
           <a class="nav-link" href="/">Login</a>
         {% endif %}
       </li>
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link" href="/all-profiles">All Profiles</a>
       </li>
       {% if authed %}
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link" href="/friends">My Friends</a>
       </li>
 
@@ -83,49 +86,87 @@
   </div>
 </nav>
 <body>
-  <div align="center" style="top: 30%;">
-    <table style="width: 50%; height: 100%; border: 1px solid black;" class="table table-light">
-      <div class="container">
-      <thead>
-        <tr>
-
-          <th scope="col">Incoming</th>
-          <th scope="col">Outgoing</th>
-          <th scope="col">Friends</th>
-
-        </tr>
-      </thead>
-      </div>
-      <tbody>
-        <tr>
-          {% if leni > 0 %}
-            {% for person in incoming %}
-            <td> {{person}} </td>
-            {% endfor %}
-          {% else %}
-            <td> No incoming requests. </td>
-          {% endif %}
-        </tr>
-        <tr>
-          {% if leno > 0 %}
-            {% for person in outgoing %}
-            <td> {{person}} </td>
-            {% endfor %}
-          {% else %}
-            <td> No incoming requests. </td>
-          {% endif %}
-        </tr>
-        <tr>
-          {% if lenf > 0 %}
-            {% for person in friends %}
-            <td> {{person}} </td>
-            {% endfor %}
-          {% else %}
-            <td> No friends. </td>
-          {% endif %}
-        </tr>
-      </tbody>
-    </table>
+<div class="parent">
+  <div class="container mt-5">
+    <div>
+        <div class="col-md-7">
+            <div id="outgoing_div" class="card p-3 py-4 border-dark" style="width: 26rem; ">
+              <h4 align="center"> Outgoing Requests </h4>
+              {% if leno > 0 %}
+                {% for o in outgoing %}
+                  <form method="POST" action="/cancel_friendship?users={{ auth }}+{{ o }}">
+                    <div>
+                      <label for="cancelBtn" class="mr-3 my-3"> @{{ o }} </label> <button align="right" class="btn btn-danger" id="cancelBtn">Cancel</button>
+                    </div>
+                  </form>
+                {% endfor %}
+              {% else %}
+                <p class="my-3"> No outgoing requests. </p>
+              {% endif %}
+            </div>
+        </div>
+    </div>
   </div>
+
+  <div class="container mt-5">
+    <div>
+        <div class="col-md-7">
+            <div id="incoming_div" class="card p-3 py-4 border-dark" style="width: 26rem; ">
+              <h4 align="center"> Incoming Requests </h4>
+              {% if leni > 0 %}
+                {% for i in incoming %}
+
+                <div>
+
+                  <label for="acceptBtn" class="mr-3 my-3"> @{{ i }} </label>
+                  <div class="inner">
+                    <form method="POST" action="/confirm_friendship?users={{ i }}+{{ auth }}">
+                      <button class="btn btn-success" id="acceptBtn">Accept</button>
+                    </form>
+                  </div>
+
+                  <div class="inner">
+                    <form method="POST" action="/cancel_friendship?users={{ auth }}+{{ i }}">
+                      <button class="btn btn-danger" id="cancelBtn">Cancel</button>
+                    </form>
+                  </div>
+                </div>
+
+                {% endfor %}
+              {% else %}
+                <p class="my-3"> No incoming requests. </p>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="container mt-5">
+    <div>
+        <div class="col-md-7">
+            <div id="friends_div" class="card p-3 py-4 border-dark" style="width: 26rem; ">
+              <h4 align="center"> My Friends </h4>
+              {% if lenf > 0 %}
+                {% for f in friends %}
+
+                <div>
+
+                  <label for="cancelBtn" class="mr-3 my-3"> @{{ f }} </label>
+                  <div class="inner">
+                    <form method="POST" action="/cancel_friendship?users={{ auth }}+{{ f }}">
+                      <button class="btn btn-danger" id="cancelBtn">Remove</button>
+                    </form>
+                  </div>
+                </div>
+
+                {% endfor %}
+              {% else %}
+                <p class="my-3"> No friends. </p>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -31,15 +31,20 @@ class user_profile:
         self.interests = interests
 
 
-def accept_friend_request(username1, username2):
-    myquery = {"username1": username1, "username2": username2}
-    friend_db.update_one(myquery, profile_dict)
-    profile_dict = { "$set": {"status": 2}}
+def verify_credentials(username, password):
+    verified = False
+    count = 0
+    query = {"username": username}
+    mydoc = user_account_db.find(query)
+    for x in mydoc:
+        if password == f.decrypt(x['password']).decode():
+            verified = True
 
+    return verified
 
 def get_incoming(username):
     accs = []
-    query = {"username2": username}
+    query = {"username2": username, "status": 1}
     mydoc = friend_db.find(query)
     for x in mydoc:
         accs.append(x['username1'])
@@ -49,7 +54,7 @@ def get_incoming(username):
 
 def get_outgoing(username):
     accs = []
-    query = {"username1": username}
+    query = {"username1": username, "status": 1}
     mydoc = friend_db.find(query)
     for x in mydoc:
         accs.append(x['username2'])
@@ -95,16 +100,20 @@ def find_user_profile(username):
         return None
 
 
-def verify_credentials(username, password):
-    verified = False
-    count = 0
-    query = {"username": username}
-    mydoc = user_account_db.find(query)
-    for x in mydoc:
-        if password == f.decrypt(x['password']).decode():
-            verified = True
+def accept_friend_request(username1, username2):
+    myquery = {"username1": username1, "username2": username2}
+    profile_dict = { "$set": {"status": 2}}
+    friend_dict = {"username1": username2, "username2": username1, "status": 2}
+    friend_db.insert_one(friend_dict)
+    friend_db.update_one(myquery, profile_dict)
 
-    return verified
+
+def cancel_friend_request(username1, username2):
+    myquery = {"username1": username1, "username2": username2}
+    myquery2 = {"username2": username1, "username1": username2}
+    friend_db.delete_one(myquery)
+    friend_db.delete_one(myquery2)
+
 
 def check_friendship(username1, username2):
     status = 0
@@ -125,6 +134,8 @@ def create_a_friendship(username1, username2):
     except:
         return False
 
+
+
 @app.route('/')
 def index():
     try:
@@ -138,22 +149,24 @@ def index():
         return render_template('views/index.html', authed=False, username='')
 
 
-@app.route('/friends')
-def friends():
-    username = request.cookies.get('userID')
-    incoming = get_incoming(username)
-    outgoing = get_outgoing(username)
-    friends = get_friends(username)
-
-    return render_template('views/friends.html', username=username, friends=friends, outgoing=outgoing, incoming=incoming, leni=len(incoming), leno=len(outgoing), lenf=len(friends))
-
-
 @app.route('/search', methods=['POST'])
 def search():
     query = request.form['searchquery']
     # find the query if its in bio/name/interests of all users
 
     return render_template('views/searchresults.html', results=results)
+
+
+@app.route('/friends')
+def friends():
+    username = request.cookies.get('userID')
+    if username: authed = True
+    incoming = get_incoming(username)
+    outgoing = get_outgoing(username)
+    friends = get_friends(username)
+
+    return render_template('views/friends.html', authed=authed, auth=username, friends=friends, outgoing=outgoing, incoming=incoming, leni=len(incoming), leno=len(outgoing), lenf=len(friends))
+
 
 @app.route('/create_friendship', methods=['POST'])
 def create_friendship():
@@ -163,6 +176,28 @@ def create_friendship():
 
     else:
         return render_template('views/error.html', err='Could not add friend.')
+
+
+@app.route('/confirm_friendship', methods=['POST'])
+def confirm():
+    users = request.args.get('users').split(' ')
+    if check_friendship(users[0], users[1]) == 1:
+        accept_friend_request(users[0], users[1])
+        return redirect(request.referrer)
+
+    else:
+        return render_template('views/error.html', err='Can not confirm a friendship that doesn\'t exist.')
+
+
+@app.route('/cancel_friendship', methods=['POST'])
+def cancel_friend_ship():
+    users = request.args.get('users').split(' ')
+    if (check_friendship(users[0], users[1]) != 0) or (check_friendship(users[1], users[0]) != 0):
+        cancel_friend_request(users[0], users[1])
+        return redirect(request.referrer)
+
+    else:
+        return render_template('views/error.html', err='Can not cancel a friendship that doesn\'t exist.')
 
 
 @app.route('/all-profiles')
@@ -304,7 +339,7 @@ def edit_profile():
 
 
 
-@app.route('/edit_profile_layout', methods=['POST'])
+@app.route('/edit-profile-layout', methods=['POST'])
 def edit_profile_layout():
     auth = request.cookies.get('userID')
     user = find_user_profile(auth)

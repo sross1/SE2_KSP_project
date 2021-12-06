@@ -31,6 +31,40 @@ class user_profile:
         self.interests = interests
 
 
+def accept_friend_request(username1, username2):
+    myquery = {"username1": username1, "username2": username2}
+    friend_db.update_one(myquery, profile_dict)
+    profile_dict = { "$set": {"status": 2}}
+
+
+def get_incoming(username):
+    accs = []
+    query = {"username2": username}
+    mydoc = friend_db.find(query)
+    for x in mydoc:
+        accs.append(x['username1'])
+
+    return accs
+
+
+def get_outgoing(username):
+    accs = []
+    query = {"username1": username}
+    mydoc = friend_db.find(query)
+    for x in mydoc:
+        accs.append(x['username2'])
+
+    return accs
+
+def get_friends(username):
+    accs = []
+    query = {"username1": username, "status": 2}
+    mydoc = friend_db.find(query)
+    for x in mydoc:
+        accs.append(x['username2'])
+
+    return accs
+
 def find_account(username):
     found = False
     count = 0
@@ -106,10 +140,12 @@ def index():
 
 @app.route('/friends')
 def friends():
-    # check if user logged in has received friend requests
-    # and see if they've sent any
-    # also check for tuples where they are friends (status=2)
-    return render_template_string("friends")
+    username = request.cookies.get('userID')
+    incoming = get_incoming(username)
+    outgoing = get_outgoing(username)
+    friends = get_friends(username)
+
+    return render_template('views/friends.html', username=username, friends=friends, outgoing=outgoing, incoming=incoming, leni=len(incoming), leno=len(outgoing), lenf=len(friends))
 
 
 @app.route('/search', methods=['POST'])

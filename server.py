@@ -160,10 +160,26 @@ def index():
 
 @app.route('/search', methods=['POST'])
 def search():
-    query = request.form['searchquery']
+    data = request.form['search']
     # find the query if its in bio/name/interests of all users
+    username = request.cookies.get('userID')
+    user_profile_list = []
+    cursor = user_profile_db
 
-    return render_template('views/searchresults.html', results=results)
+
+    for x in cursor.find():
+        lower_interests = [s.lower() for s in x['interests']]
+        check = lambda x: data.lower() in x.lower()
+        if check(x['username']) or check(x['name']) or check(x['major']) or check(x['year']) or check(x['biography']) or data.lower() in lower_interests:
+            pro = user_profile(x['username'], x['name'], x['age'], x['major'], x['year'], x['biography'], x['interests'])
+            user_profile_list.append(pro)
+
+
+    if username:
+        return render_template('views/searchresults.html', check_friendship=check_friendship, authed=True, auth=username, user_profile_list=user_profile_list)
+
+    else:
+        return render_template('views/searchresults.html', authed=False, user_profile_list=user_profile_list)
 
 
 @app.route('/friends')

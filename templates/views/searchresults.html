@@ -7,16 +7,18 @@
 <script type="text/javascript" src="fileUpload.js"></script>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="../../static/styles.css">
-<title> All Profiles </title>
+<title> Search Results </title>
 <style>
   .parent {
     display: grid;
     grid-template-columns: fit-content(40%) fit-content(40%) fit-content(40%);
     grid-template-rows: auto;
     justify-content: center;
-
   }
 
+  .profile{
+    font-size: 22px;
+  }
 
   body{
     color: black;
@@ -40,7 +42,7 @@
       </li>
       <li class="nav-item">
         {% if authed %}
-          <a class="nav-link" href="/profile/{{ username }}">My Profile</a>
+          <a class="nav-link" href="/profile/{{ auth }}">My Profile</a>
         {% else %}
           <a class="nav-link" href="/">Login</a>
         {% endif %}
@@ -48,10 +50,11 @@
       <li class="nav-item active">
         <a class="nav-link" href="/all-profiles">All Profiles</a>
       </li>
+      {% if authed %}
       <li class="nav-item">
         <a class="nav-link" href="/friends">My Friends</a>
       </li>
-      {% if authed %}
+
       <li class="nav-item">
         <a class="nav-link" href="/logout"> Logout </a>
       </li>
@@ -59,8 +62,7 @@
       <li class="nav-item">
         <form class="form-inline my-2 my-lg-0 ml-auto searchspaced" method="POST" action="/search">
           <div class="input-group">
-            <input id="searchquery" type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-            aria-describedby="search-addon" />
+            <input type="search" class="form-control rounded" name="search" placeholder="Search"></input>
             <button class="btn btn-light paddedBtn" type="submit">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -77,11 +79,11 @@
   {% for user_profile in user_profile_list %}
   <div class="container mt-5">
     <div>
-        <div class="md-7">
-            <div class="card p-3 py-4 border-dark" style="width: 22rem;">
-                <div class="text-center"> <img src="https://files.catbox.moe/kb2kvn.jpg" width="100" class="rounded-circle"> </div>
-                    <a align="center" href="/profile/{{ user_profile.username }}" class="mt-2 mb-0"> @{{ user_profile.username }} </a> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
-                    <h5 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h5>
+        <div class="col-md-7">
+            <div class="card p-3 py-4 border-dark" style="width: 26rem; ">
+                <div class="text-center"> <img src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg" width="100" class="rounded-circle"> </div>
+                    <a href="/profile/{{ user_profile.username}}" align="center" class="profile mt-2 mb-0"> @{{ user_profile.username }} </a> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
+                    <h6 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h6>
                     <div class="px-2 mt-3">
                         <p class="fonts"> {{ user_profile.biography }} </p>
                         <p class="fonts"> Here are some of my interests: </p>
@@ -92,27 +94,32 @@
                         {% endfor %}
                     </ul>
                     <br>
-                    {% if authed and user_profile.username == username %}
-                    <div class="buttons" align="center">
-                      <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
-                    </div>
-                    {% elif authed and user_profile.username != username %}
-                    <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
-                      {% if not check_friendship(username, user_profile.username) %}
+                    {% if authed and auth==user_profile.username %}
                       <div class="buttons" align="center">
-                        <button class="btn btn-outline-primary px-4">Friend</button>
+                        <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
                       </div>
-                    </form>
-                      {% else %}
+                    {% elif authed %}
+                    {% if (check_friendship(auth, user_profile.username) == 0) %}
+                      <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
+                        <div class="buttons" align="center">
+                          <button class="btn btn-outline-primary px-4">Friend</button>
+                        </div>
+                      </form>
+                    {% elif (check_friendship(auth, user_profile.username) == 1) %}
                       <div class="buttons" align="center">
-                        <button class="btn btn-success px-4">Friends</button>
+                        <button class="btn btn-success disabled px-4">Sent</button>
                       </div>
-                      {% endif %}
+
+                    {% elif check_friendship(auth, user_profile.username) == 2 %}
+                      <div class="buttons" align="center">
+                        <button class="btn btn-success disabled px-4">Friends</button>
+                      </div>
                     {% endif %}
+                  {% endif %}
+                </div>
             </div>
         </div>
     </div>
-  </div>
   {% endfor %}
 </div>
 </body>

@@ -85,6 +85,7 @@ def find_account(username):
     return found
 
 def find_account_email(username):
+    email = ''
     query = {"username": username}
     mydoc = user_account_db.find(query)
     for x in mydoc:

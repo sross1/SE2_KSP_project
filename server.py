@@ -109,7 +109,6 @@ def find_user_profile(username):
     else:
         return None
 
-
 def accept_friend_request(username1, username2):
     myquery = {"username1": username1, "username2": username2}
     profile_dict = { "$set": {"status": 2}}
@@ -145,6 +144,22 @@ def create_a_friendship(username1, username2):
         return False
 
 
+def check_friendship(username1, username2):
+    counter = 0
+    query = {"username1": username1, "username2": username2}
+    mydoc = friend_db.find(query)
+    for x in mydoc:
+        counter+=1
+
+    if counter == 0:
+        return False
+
+    else:
+        return True
+
+def create_a_friendship(username1, username2):
+    friend_dict = {"username1": username1, "username2": username2, "status": 1}
+    friend_db.insert_one(friend_dict)
 
 @app.route('/')
 def index():
@@ -178,7 +193,6 @@ def search():
 
     if username:
         return render_template('views/searchresults.html', check_friendship=check_friendship, authed=True, auth=username, user_profile_list=user_profile_list)
-
     else:
         return render_template('views/searchresults.html', authed=False, user_profile_list=user_profile_list)
 
@@ -270,6 +284,7 @@ def create_profile():
 @app.route('/create_account', methods=['POST'])
 def create():
     try:
+
         username = request.form['username'].replace(' ', '')
         email = request.form['email']
         if len(username) > 1:
@@ -283,7 +298,6 @@ def create():
 
             else:
                 return render_template('views/error.html', err='Username already taken.')
-
         else:
             return render_template('views/error.html', err='Please enter a non-spaced username.')
 
@@ -338,7 +352,6 @@ def get_user(username):
 
     if user:
         return render_template('views/profile.html', email=email, check_friendship=check_friendship, auth=auth, authedself=authedself , user_profile=user, authed=authed)
-
     else:
         if authed:
             return redirect('/setup-profile')
@@ -370,6 +383,7 @@ def edit_profile():
 
 
 @app.route('/edit-profile-layout', methods=['POST'])
+
 def edit_profile_layout():
     auth = request.cookies.get('userID')
     user = find_user_profile(auth)

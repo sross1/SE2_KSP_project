@@ -30,7 +30,7 @@ body{
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/">Home </a>
         </li>
         {% if authed %}
         <li class="nav-item active">
@@ -76,6 +76,7 @@ body{
         <div class="col-md-7">
             <div class="card p-3 py-4 border-dark" style="width: 26rem; ">
                 <div class="text-center"> <img src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg" width="100" class="rounded-circle"> </div>
+
                     <h5 align="center" class="mt-2 mb-0"> @{{ user_profile.username }} </h5> <h4 align="center" class="mt-2 mb-0">{{ user_profile.name }} </h4>
                     <h6 align="center" class="mt-2 mb-0"> {{ user_profile.year }} majoring in {{ user_profile.major }} </h6>
                     <div class="px-2 mt-3">
@@ -88,10 +89,24 @@ body{
                     {% endfor %}
                     </ul>
 
+
                     {% if check_friendship(auth, user_profile.username) == 2 %}
                     <div class="px-2 mt-3">
                       <p class="fonts"> Contact email: <a href="mailto: {{ email }}"> {{ email }} </a> </p>
+
                     </div>
+                    {% elif authed %}
+                    <form method="POST" action="/create_friendship?users={{ auth }}+{{ user_profile.username }}">
+                      {% if not check_friendship(auth, user_profile.username) %}
+                      <div class="buttons" align="center">
+                        <button class="btn btn-outline-primary px-4">Friend</button>
+                      </div>
+                    </form>
+                      {% else %}
+                      <div class="buttons" align="center">
+                        <button class="btn btn-success px-4">Friends</button>
+                      </div>
+                      {% endif %}
                     {% endif %}
                     <br>
                     {% if authedself %}

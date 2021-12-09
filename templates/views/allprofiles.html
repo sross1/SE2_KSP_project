@@ -23,7 +23,7 @@
   body{
     color: black;
   }
-
+  
   a{
     font-size:1rem;
   }
@@ -94,6 +94,7 @@
                         {% endfor %}
                     </ul>
                     <br>
+
                     {% if authed and auth==user_profile.username %}
                       <div class="buttons" align="center">
                         <button onclick="window.location.href='http://localhost/edit_profile'" class="btn btn-outline-primary px-4">Edit</button>
@@ -117,6 +118,7 @@
                     {% endif %}
                   {% endif %}
                 </div>
+
             </div>
         </div>
     </div>
